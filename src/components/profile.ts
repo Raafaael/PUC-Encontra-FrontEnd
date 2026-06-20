@@ -4,49 +4,113 @@ import { renderLocked } from "./shared.js";
 
 export function renderPerfilView(state: AppState): string {
   if (!state.user) return renderLocked();
+  const tipo = state.user.perfil?.tipo || (state.user.is_staff ? "admin" : "usuario");
 
   return `
-    <section class="view-header">
-      <div>
-        <h1>Perfil</h1>
-        <p>${escapeHtml(state.user.username)}</p>
+    <h1>Meu Perfil</h1>
+
+    <div class="profile-info">
+      <p>
+        <strong>Usuario:</strong> ${escapeHtml(state.user.username)}
+        &middot;
+        <strong>Tipo:</strong>
+        <span class="badge badge-${tipo}">${tipo === "admin" ? "Administrador" : "Usuario"}</span>
+      </p>
+    </div>
+
+    <form class="form-card" id="profileForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="id_first_name">Nome</label>
+          <input type="text" name="first_name" id="id_first_name" value="${escapeHtml(state.user.first_name)}" required />
+        </div>
+        <div class="form-group">
+          <label for="id_last_name">Sobrenome</label>
+          <input type="text" name="last_name" id="id_last_name" value="${escapeHtml(state.user.last_name)}" required />
+        </div>
       </div>
-    </section>
-    <div class="profile-grid">
-      <form class="tool-panel" id="profileForm">
-        <div class="panel-title"><i data-icon="user-cog"></i><h2>Dados</h2></div>
-        <div class="grid-2">
-          <label><span>Nome</span><input name="first_name" value="${escapeHtml(state.user.first_name)}" /></label>
-          <label><span>Sobrenome</span><input name="last_name" value="${escapeHtml(state.user.last_name)}" /></label>
+
+      <div class="form-group">
+        <label for="id_email">E-mail</label>
+        <input type="email" name="email" id="id_email" value="${escapeHtml(state.user.email)}" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="id_matricula">Matricula</label>
+          <input type="text" name="matricula" id="id_matricula" value="${escapeHtml(state.user.perfil?.matricula)}" />
         </div>
-        <label><span>E-mail</span><input name="email" type="email" value="${escapeHtml(state.user.email)}" /></label>
-        <div class="grid-2">
-          <label><span>Matricula</span><input name="matricula" value="${escapeHtml(state.user.perfil?.matricula)}" /></label>
-          <label><span>Telefone</span><input name="telefone" value="${escapeHtml(state.user.perfil?.telefone)}" /></label>
+        <div class="form-group">
+          <label for="id_telefone">Telefone *</label>
+          <input type="text" name="telefone" id="id_telefone" required placeholder="(11) 99999-9999" value="${escapeHtml(state.user.perfil?.telefone)}" />
         </div>
-        <button class="btn primary" type="submit" title="Salvar perfil"><i data-icon="save"></i><span>Salvar</span></button>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Salvar Alteracoes</button>
+    </form>
+
+    <hr class="separator">
+
+    <div class="form-card">
+      <h2>Seguranca</h2>
+      <p>Altere sua senha de acesso ao sistema.</p>
+      <a href="#" data-nav="trocar-senha" class="btn btn-primary">Trocar Senha</a>
+    </div>
+
+    <hr class="separator">
+
+    <div class="danger-zone">
+      <h2>Zona de Perigo</h2>
+      <p>Ao desativar sua conta, voce perdera o acesso ao sistema e suas solicitacoes pendentes serao canceladas. Para reativa-la, entre em contato com o administrador.</p>
+      <a href="#" data-nav="desativar-conta" class="btn btn-danger">Desativar Minha Conta</a>
+    </div>
+  `;
+}
+
+export function renderTrocarSenhaView(state: AppState): string {
+  if (!state.user) return renderLocked();
+
+  return `
+    <h1>Trocar Senha</h1>
+
+    <form class="form-card" id="passwordForm">
+      <div class="form-group">
+        <label for="id_old_password">Senha atual</label>
+        <input type="password" name="senha_atual" id="id_old_password" required autofocus />
+      </div>
+
+      <div class="form-group">
+        <label for="id_new_password1">Nova senha</label>
+        <input type="password" name="nova_senha" id="id_new_password1" required />
+        <span class="form-help">Minimo 8 caracteres. Nao pode ser so numeros.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="id_new_password2">Confirmar nova senha</label>
+        <input type="password" name="nova_senha_confirm" id="id_new_password2" required />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Alterar Senha</button>
+      <a href="#" data-nav="perfil" class="btn">Cancelar</a>
+    </form>
+  `;
+}
+
+export function renderDesativarContaView(state: AppState): string {
+  if (!state.user) return renderLocked();
+
+  return `
+    <div class="confirm-delete">
+      <h1>Desativar Conta</h1>
+      <p>Tem certeza que deseja desativar sua conta <strong>${escapeHtml(state.user.username)}</strong>?</p>
+      <p class="warning-text">Voce perdera o acesso ao sistema, e suas solicitacoes pendentes serao canceladas. Para reativa-la, entre em contato com o administrador.</p>
+
+      <form id="deactivateForm">
+        <div class="form-actions">
+          <button type="submit" class="btn btn-danger">Sim, desativar minha conta</button>
+          <a href="#" data-nav="perfil" class="btn btn-secondary">Cancelar</a>
+        </div>
       </form>
-      <form class="tool-panel" id="passwordForm">
-        <div class="panel-title"><i data-icon="key-round"></i><h2>Senha</h2></div>
-        <label><span>Senha atual</span><input name="senha_atual" type="password" autocomplete="current-password" required /></label>
-        <label><span>Nova senha</span><input name="nova_senha" type="password" autocomplete="new-password" minlength="8" required /></label>
-        <button class="btn primary" type="submit" title="Trocar senha"><i data-icon="refresh-cw"></i><span>Trocar</span></button>
-      </form>
-      <section class="tool-panel">
-        <div class="panel-title"><i data-icon="mail-question"></i><h2>Recuperacao</h2></div>
-        <form id="resetRequestForm" class="stack">
-          <label><span>E-mail</span><input name="email" type="email" value="${escapeHtml(state.user.email)}" required /></label>
-          <button class="btn neutral" type="submit" title="Solicitar recuperacao"><i data-icon="send"></i><span>Solicitar</span></button>
-        </form>
-        <form id="resetConfirmForm" class="stack">
-          <div class="grid-2">
-            <label><span>UID</span><input name="uid" value="${escapeHtml(state.resetDraft.uid)}" required /></label>
-            <label><span>Token</span><input name="token" value="${escapeHtml(state.resetDraft.token)}" required /></label>
-          </div>
-          <label><span>Nova senha</span><input name="nova_senha" type="password" minlength="8" required /></label>
-          <button class="btn neutral" type="submit" title="Confirmar recuperacao"><i data-icon="check-circle-2"></i><span>Confirmar</span></button>
-        </form>
-      </section>
     </div>
   `;
 }
