@@ -1,24 +1,34 @@
-import { DEFAULT_API_BASE_URL, STORAGE_KEYS } from "../config.js";
+import { STORAGE_KEYS } from "../config.js";
 import type { AppState } from "../types.js";
 
 export function createInitialState(): AppState {
   return {
-    apiBase: localStorage.getItem(STORAGE_KEYS.apiBase) || DEFAULT_API_BASE_URL,
     token: localStorage.getItem(STORAGE_KEYS.token),
     user: null,
-    view: "explorar",
-    authMode: "login",
+    view: "inicio",
     objetos: [],
     meusObjetos: [],
     categorias: [],
     locais: [],
+    usuarios: [],
     editingObjectId: null,
+    selectedObjectId: null,
     adminEdit: null,
+    adminUserEditId: null,
     filters: {
       search: "",
       tipo: "",
       categoria: "",
       local: "",
+    },
+    meusFilters: {
+      tipo: "",
+      status: "",
+    },
+    aprovacoesFilter: "",
+    usuariosFilters: {
+      search: "",
+      tipo: "",
     },
     resetDraft: {
       uid: "",

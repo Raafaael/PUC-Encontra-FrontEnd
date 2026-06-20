@@ -13,6 +13,7 @@ export type Usuario = {
   nome: string;
   perfil: Perfil | null;
   is_staff: boolean;
+  is_active: boolean;
 };
 
 export type Categoria = {
@@ -62,8 +63,26 @@ export type Paginated<T> = {
   results: T[];
 };
 
-export type ViewName = "explorar" | "meus" | "perfil" | "admin";
-export type AuthMode = "login" | "register";
+export type ViewName =
+  | "inicio"
+  | "explorar"
+  | "dashboard"
+  | "meus"
+  | "objeto-form"
+  | "objeto-detail"
+  | "perfil"
+  | "trocar-senha"
+  | "desativar-conta"
+  | "password-reset"
+  | "aprovacoes"
+  | "categorias"
+  | "categoria-form"
+  | "locais"
+  | "local-form"
+  | "usuarios"
+  | "usuario-form"
+  | "login"
+  | "cadastro";
 export type NoticeTone = "success" | "error" | "info";
 
 export type AdminEditTarget = { kind: "categoria" | "local"; id: number } | null;
@@ -75,24 +94,33 @@ export type FiltrosObjeto = {
   local: string;
 };
 
+export type FiltrosUsuario = {
+  search: string;
+  tipo: string;
+};
+
 export type ResetDraft = {
   uid: string;
   token: string;
 };
 
 export type AppState = {
-  apiBase: string;
   token: string | null;
   user: Usuario | null;
   view: ViewName;
-  authMode: AuthMode;
   objetos: Objeto[];
   meusObjetos: Objeto[];
   categorias: Categoria[];
   locais: Local[];
+  usuarios: Usuario[];
   editingObjectId: number | null;
+  selectedObjectId: number | null;
   adminEdit: AdminEditTarget;
+  adminUserEditId: number | null;
   filters: FiltrosObjeto;
+  meusFilters: Pick<FiltrosObjeto, "tipo"> & { status: string };
+  aprovacoesFilter: string;
+  usuariosFilters: FiltrosUsuario;
   resetDraft: ResetDraft;
   notice: { message: string; tone: NoticeTone } | null;
   loading: boolean;
