@@ -7,6 +7,7 @@ import type { AppState, Categoria, Local, NoticeTone, Objeto, Paginated, Usuario
 import { syncIcons } from "../ui/icons.js";
 import { formData } from "../utils/forms.js";
 import { unwrapResults } from "../utils/pagination.js";
+import { pathForState, routeFromPath } from "../utils/router.js";
 
 export class PucEncontraApp {
   private readonly state: AppState;
@@ -15,6 +16,7 @@ export class PucEncontraApp {
 
   constructor(private readonly root: HTMLDivElement) {
     this.state = createInitialState();
+    this.applyBrowserRoute();
     this.api = new ApiClient(
       () => DEFAULT_API_BASE_URL,
       () => this.state.token,
@@ -22,6 +24,10 @@ export class PucEncontraApp {
   }
 
   start(): void {
+    window.addEventListener("popstate", () => {
+      this.applyBrowserRoute();
+      this.render();
+    });
     this.render();
     void this.refreshData();
   }
@@ -30,6 +36,25 @@ export class PucEncontraApp {
     this.root.innerHTML = renderLayout(this.state, renderCurrentView(this.state));
     this.bindEvents();
     syncIcons();
+  }
+
+  private applyBrowserRoute(): void {
+    const route = routeFromPath(window.location.pathname);
+    this.state.view = route.view;
+    this.state.selectedObjectId = route.selectedObjectId;
+  }
+
+  private setView(view: ViewName, replace = false): void {
+    this.state.view = view;
+    this.syncBrowserUrl(replace);
+  }
+
+  private syncBrowserUrl(replace = false): void {
+    const path = pathForState(this.state);
+    if (window.location.pathname === path) return;
+
+    // Mantem a tela selecionada no estado do app e tambem na barra de enderecos.
+    window.history[replace ? "replaceState" : "pushState"]({}, "", path);
   }
 
   private setToken(token: string | null): void {
@@ -81,7 +106,7 @@ export class PucEncontraApp {
         try {
           this.state.user = await this.api.request<Usuario>("/auth/me/");
           if (this.state.view === "inicio" || this.state.view === "login" || this.state.view === "cadastro") {
-            this.state.view = "dashboard";
+            this.setView("dashboard", true);
           }
           const meus = await this.api.request<Paginated<Objeto> | Objeto[]>("/objetos/meus/");
           this.state.meusObjetos = unwrapResults(meus);
@@ -161,13 +186,13 @@ export class PucEncontraApp {
     }
 
     if (!hasSession && this.isAuthenticatedView(next)) {
-      this.state.view = "login";
+      this.setView("login");
       this.render();
       return;
     }
 
     if (this.isAdminView(next) && !this.state.user?.is_staff) {
-      this.state.view = "dashboard";
+      this.setView("dashboard");
       this.setNotice("Voce nao tem permissao para acessar esta pagina.", "error");
       return;
     }
@@ -182,7 +207,7 @@ export class PucEncontraApp {
       this.state.selectedObjectId = null;
     }
 
-    this.state.view = next;
+    this.setView(next);
     this.render();
   }
 
@@ -194,7 +219,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-create-object]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.editingObjectId = null;
-        this.state.view = "objeto-form";
+        this.setView("objeto-form");
         this.render();
       });
     });
@@ -203,7 +228,7 @@ export class PucEncontraApp {
       link.addEventListener("click", (event) => {
         event.preventDefault();
         this.state.selectedObjectId = Number(link.dataset.viewObject);
-        this.state.view = "objeto-detail";
+        this.setView("objeto-detail");
         this.render();
       });
     });
@@ -218,7 +243,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-edit-object]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.editingObjectId = Number(button.dataset.editObject);
-        this.state.view = "objeto-form";
+        this.setView("objeto-form");
         this.render();
       });
     });
@@ -236,7 +261,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-create-categoria]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.adminEdit = null;
-        this.state.view = "categoria-form";
+        this.setView("categoria-form");
         this.render();
       });
     });
@@ -244,7 +269,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-edit-categoria]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.adminEdit = { kind: "categoria", id: Number(button.dataset.editCategoria) };
-        this.state.view = "categoria-form";
+        this.setView("categoria-form");
         this.render();
       });
     });
@@ -256,7 +281,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-create-local]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.adminEdit = null;
-        this.state.view = "local-form";
+        this.setView("local-form");
         this.render();
       });
     });
@@ -264,7 +289,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-edit-local]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.adminEdit = { kind: "local", id: Number(button.dataset.editLocal) };
-        this.state.view = "local-form";
+        this.setView("local-form");
         this.render();
       });
     });
@@ -284,7 +309,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-create-usuario]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.adminUserEditId = null;
-        this.state.view = "usuario-form";
+        this.setView("usuario-form");
         this.render();
       });
     });
@@ -292,7 +317,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-edit-usuario]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.adminUserEditId = Number(button.dataset.editUsuario);
-        this.state.view = "usuario-form";
+        this.setView("usuario-form");
         this.render();
       });
     });
@@ -308,7 +333,7 @@ export class PucEncontraApp {
       });
       this.setToken(response.token);
       this.state.user = response.user;
-      this.state.view = "dashboard";
+      this.setView("dashboard");
       this.setNotice("Login realizado.", "success");
       await this.refreshData();
     } catch (error) {
@@ -326,7 +351,7 @@ export class PucEncontraApp {
       });
       this.setToken(response.token);
       this.state.user = response.user;
-      this.state.view = "dashboard";
+      this.setView("dashboard");
       this.setNotice("Cadastro realizado.", "success");
       await this.refreshData();
     } catch (error) {
@@ -343,7 +368,7 @@ export class PucEncontraApp {
     this.setToken(null);
     this.state.user = null;
     this.state.meusObjetos = [];
-    this.state.view = "inicio";
+    this.setView("inicio");
     this.setNotice("Sessao encerrada.", "success");
   }
 
@@ -393,33 +418,40 @@ export class PucEncontraApp {
 
   private async handleObjectSubmit(event: SubmitEvent): Promise<void> {
     event.preventDefault();
-    const data = formData(event.currentTarget as HTMLFormElement);
+    const form = event.currentTarget as HTMLFormElement;
+    const data = formData(form);
     const id = data.id;
     const existing = id
       ? this.state.meusObjetos.find((objeto) => objeto.id === Number(id))
         || this.state.objetos.find((objeto) => objeto.id === Number(id))
       : null;
-    const payload = {
-      tipo: data.tipo,
-      status: existing?.status ?? (this.state.user?.is_staff ? "ativo" : "pendente"),
-      titulo: data.titulo,
-      descricao: data.descricao,
-      categoria: data.categoria ? Number(data.categoria) : null,
-      local: data.local ? Number(data.local) : null,
-      data_ocorrencia: data.data_ocorrencia,
-      ponto_referencia: existing?.ponto_referencia ?? "",
-      contato: existing?.contato ?? "",
-      imagem_url: data.imagem_url,
-    };
+    const payload = new FormData();
+    const imageInput = form.elements.namedItem("imagem") as HTMLInputElement | null;
+    const imageFile = imageInput?.files?.[0];
+
+    // Objetos usam multipart para permitir cadastro com arquivo local de imagem.
+    payload.set("tipo", data.tipo);
+    payload.set("status", existing?.status ?? (this.state.user?.is_staff ? "ativo" : "pendente"));
+    payload.set("titulo", data.titulo);
+    payload.set("descricao", data.descricao);
+    payload.set("categoria", data.categoria);
+    payload.set("local", data.local);
+    payload.set("data_ocorrencia", data.data_ocorrencia);
+    payload.set("ponto_referencia", existing?.ponto_referencia ?? "");
+    payload.set("contato", existing?.contato ?? "");
+    payload.set("imagem_url", existing?.imagem_url ?? "");
+    if (imageFile && imageFile.size > 0) {
+      payload.set("imagem", imageFile);
+    }
 
     try {
       await this.api.request<Objeto>(id ? `/objetos/${id}/` : "/objetos/", {
         method: id ? "PATCH" : "POST",
-        body: JSON.stringify(payload),
+        body: payload,
       });
       this.state.editingObjectId = null;
       this.state.selectedObjectId = null;
-      this.state.view = "meus";
+      this.setView("meus");
       this.setNotice("Registro salvo.", "success");
       await this.refreshData();
     } catch (error) {
@@ -448,7 +480,7 @@ export class PucEncontraApp {
       await this.api.request<void>(`/objetos/${id}/`, { method: "DELETE" });
       this.state.editingObjectId = null;
       this.state.selectedObjectId = null;
-      this.state.view = "meus";
+      this.setView("meus");
       this.setNotice("Registro excluido.", "success");
       await this.refreshData();
     } catch (error) {
@@ -485,7 +517,7 @@ export class PucEncontraApp {
           nova_senha: payload.nova_senha,
         }),
       });
-      this.state.view = "perfil";
+      this.setView("perfil");
       this.setNotice("Senha alterada com sucesso.", "success");
     } catch (error) {
       this.setNotice(error instanceof Error ? error.message : "Falha ao trocar senha.", "error");
@@ -506,7 +538,7 @@ export class PucEncontraApp {
       if (response.reset) {
         this.state.resetDraft = response.reset;
       }
-      this.state.view = "password-reset";
+      this.setView("password-reset");
       this.setNotice(response.detail, "success");
     } catch (error) {
       this.setNotice(error instanceof Error ? error.message : "Falha ao solicitar recuperacao.", "error");
@@ -530,7 +562,7 @@ export class PucEncontraApp {
         }),
       });
       this.state.resetDraft = { uid: "", token: "" };
-      this.state.view = "login";
+      this.setView("login");
       this.setNotice(response.detail, "success");
     } catch (error) {
       this.setNotice(error instanceof Error ? error.message : "Falha ao redefinir senha.", "error");
@@ -546,7 +578,7 @@ export class PucEncontraApp {
       this.setToken(null);
       this.state.user = null;
       this.state.meusObjetos = [];
-      this.state.view = "inicio";
+      this.setView("inicio");
       this.setNotice("Conta desativada.", "success");
     } catch (error) {
       this.setNotice(error instanceof Error ? error.message : "Falha ao desativar conta.", "error");
@@ -564,7 +596,7 @@ export class PucEncontraApp {
         body: JSON.stringify({ nome: payload.nome, descricao: payload.descricao }),
       });
       this.state.adminEdit = null;
-      this.state.view = "categorias";
+      this.setView("categorias");
       this.setNotice("Categoria salva.", "success");
       await this.refreshData();
     } catch (error) {
@@ -588,7 +620,7 @@ export class PucEncontraApp {
         }),
       });
       this.state.adminEdit = null;
-      this.state.view = "locais";
+      this.setView("locais");
       this.setNotice("Local salvo.", "success");
       await this.refreshData();
     } catch (error) {
@@ -603,7 +635,7 @@ export class PucEncontraApp {
     try {
       await this.api.request<void>(`/${endpoint}/${id}/`, { method: "DELETE" });
       this.state.adminEdit = null;
-      this.state.view = kind === "categoria" ? "categorias" : "locais";
+      this.setView(kind === "categoria" ? "categorias" : "locais");
       this.setNotice("Item excluido.", "success");
       await this.refreshData();
     } catch (error) {
@@ -638,7 +670,7 @@ export class PucEncontraApp {
         body: JSON.stringify(body),
       });
       this.state.adminUserEditId = null;
-      this.state.view = "usuarios";
+      this.setView("usuarios");
       this.setNotice("Usuario salvo.", "success");
       await this.refreshData();
     } catch (error) {
