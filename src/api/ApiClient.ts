@@ -19,8 +19,9 @@ export class ApiClient {
   async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const headers = new Headers(options.headers);
     const hasBody = options.body !== undefined;
+    const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
 
-    if (hasBody && !headers.has("Content-Type")) {
+    if (hasBody && !isFormData && !headers.has("Content-Type")) {
       headers.set("Content-Type", "application/json");
     }
 
