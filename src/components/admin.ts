@@ -87,7 +87,7 @@ export function renderCategoriaFormView(state: AppState): string {
 
   return `
     <div class="breadcrumb">
-      <a href="#" data-nav="categorias">Categorias</a> &raquo; ${acao}
+      <a href="/categorias" data-nav="categorias">Categorias</a> &raquo; ${acao}
     </div>
 
     <h1>${acao} Categoria</h1>
@@ -107,7 +107,7 @@ export function renderCategoriaFormView(state: AppState): string {
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">${categoria ? "Salvar" : "Criar"}</button>
-        <a href="#" data-nav="categorias" class="btn btn-secondary">Cancelar</a>
+        <a href="/categorias" data-nav="categorias" class="btn btn-secondary">Cancelar</a>
       </div>
     </form>
   `;
@@ -153,7 +153,7 @@ export function renderLocalFormView(state: AppState): string {
 
   return `
     <div class="breadcrumb">
-      <a href="#" data-nav="locais">Locais</a> &raquo; ${acao}
+      <a href="/locais" data-nav="locais">Locais</a> &raquo; ${acao}
     </div>
 
     <h1>${acao} Local</h1>
@@ -184,7 +184,7 @@ export function renderLocalFormView(state: AppState): string {
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">${local ? "Salvar" : "Criar"}</button>
-        <a href="#" data-nav="locais" class="btn btn-secondary">Cancelar</a>
+        <a href="/locais" data-nav="locais" class="btn btn-secondary">Cancelar</a>
       </div>
     </form>
   `;
@@ -237,7 +237,7 @@ export function renderUsuarioFormView(state: AppState): string {
 
   return `
     <div class="breadcrumb">
-      <a href="#" data-nav="usuarios">Usuarios</a> &raquo; ${usuario ? "Editar" : "Novo administrador"}
+      <a href="/usuarios" data-nav="usuarios">Usuarios</a> &raquo; ${usuario ? "Editar" : "Novo administrador"}
     </div>
 
     <h1>${titulo}</h1>
@@ -304,7 +304,7 @@ export function renderUsuarioFormView(state: AppState): string {
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">${usuario ? "Salvar" : "Criar Administrador"}</button>
-        <a href="#" data-nav="usuarios" class="btn btn-secondary">Cancelar</a>
+        <a href="/usuarios" data-nav="usuarios" class="btn btn-secondary">Cancelar</a>
       </div>
     </form>
   `;
@@ -344,7 +344,7 @@ function renderUserDashboard(state: AppState): string {
                         <span class="badge badge-categoria">${escapeHtml(objeto.categoria_nome || "Sem categoria")}</span>
                         ${renderTipoBadge(objeto)}
                       </div>
-                      <h3><a href="#" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></h3>
+                      <h3><a href="/objetos/${objeto.id}" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></h3>
                       <p class="card-meta">${escapeHtml(objeto.local_nome || "")}${objeto.local_nome ? " &middot; " : ""}${escapeHtml(formatDate(objeto.data_ocorrencia))}</p>
                     </div>
                   `,
@@ -397,7 +397,7 @@ function renderAdminDashboard(state: AppState): string {
 
     ${
       pendentes.length
-        ? `<div class="alert alert-warning"><strong>${pendentes.length}</strong> item(ns) aguardando aprovacao. <a href="#" data-nav="aprovacoes">Ver aprovacoes &rarr;</a></div>`
+        ? `<div class="alert alert-warning"><strong>${pendentes.length}</strong> item(ns) aguardando aprovacao. <a href="/aprovacoes" data-nav="aprovacoes">Ver aprovacoes &rarr;</a></div>`
         : ""
     }
 
@@ -426,7 +426,7 @@ function renderApprovalSection(title: string, objetos: Objeto[]): string {
             .map(
               (objeto) => `
                 <tr>
-                  <td><a href="#" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></td>
+                  <td><a href="/objetos/${objeto.id}" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></td>
                   <td>${escapeHtml(objeto.usuario?.nome || objeto.usuario?.username || "-")}</td>
                   <td>${escapeHtml(objeto.categoria_nome || "-")}</td>
                   <td>${escapeHtml(formatDate(objeto.criado_em?.slice(0, 10) || objeto.data_ocorrencia))}</td>
@@ -533,7 +533,7 @@ function renderDashboardObjectTable(title: string, objetos: Objeto[], emptyText:
                   .map(
                     (objeto) => `
                       <tr>
-                        <td><a href="#" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></td>
+                        <td><a href="/objetos/${objeto.id}" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></td>
                         <td>${escapeHtml(formatDate(objeto.data_ocorrencia))}</td>
                         <td>${renderStatusBadge(objeto)}</td>
                       </tr>
@@ -542,7 +542,7 @@ function renderDashboardObjectTable(title: string, objetos: Objeto[], emptyText:
                   .join("")}
               </tbody>
             </table>
-            <a href="#" data-nav="meus" class="link-more">Ver todos &rarr;</a>
+            <a href="/meus-registros" data-nav="meus" class="link-more">Ver todos &rarr;</a>
           `
           : `<p class="empty-state">${escapeHtml(emptyText)}</p>`
       }
@@ -564,7 +564,7 @@ function renderAdminRecentTable(title: string, objetos: Objeto[], userColumn: st
                   .map(
                     (objeto) => `
                       <tr>
-                        <td><a href="#" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></td>
+                        <td><a href="/objetos/${objeto.id}" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></td>
                         <td>${escapeHtml(objeto.usuario?.nome || objeto.usuario?.username || "-")}</td>
                         <td>${renderStatusBadge(objeto)}</td>
                       </tr>

@@ -170,14 +170,14 @@ export function renderObjectFormView(state: AppState): string {
           <input type="date" name="data_ocorrencia" id="id_data_ocorrencia" required value="${escapeHtml(objeto?.data_ocorrencia || new Date().toISOString().slice(0, 10))}" />
         </div>
         <div class="form-group">
-          <label for="id_imagem">Imagem URL (opcional)</label>
-          <input type="url" name="imagem_url" id="id_imagem" value="${escapeHtml(objeto?.imagem_url)}" placeholder="https://..." />
+          <label for="id_imagem">Imagem do computador (opcional)</label>
+          <input type="file" name="imagem" id="id_imagem" accept="image/*" />
         </div>
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">${acao}</button>
-        <a href="#" data-nav="meus" class="btn btn-secondary">Cancelar</a>
+        <a href="/meus-registros" data-nav="meus" class="btn btn-secondary">Cancelar</a>
       </div>
     </form>
   `;
@@ -187,7 +187,7 @@ export function renderObjectDetailView(state: AppState): string {
   const objeto = state.objetos.find((item) => item.id === state.selectedObjectId)
     || state.meusObjetos.find((item) => item.id === state.selectedObjectId);
   if (!objeto) {
-    return `<div class="empty-state-large"><p>Item nao encontrado.</p><a href="#" data-nav="explorar" class="btn btn-primary">Voltar para itens</a></div>`;
+    return `<div class="empty-state-large"><p>Item nao encontrado.</p><a href="/explorar" data-nav="explorar" class="btn btn-primary">Voltar para itens</a></div>`;
   }
 
   const canManage = Boolean(state.user && (state.user.is_staff || objeto.usuario?.id === state.user.id));
@@ -199,7 +199,7 @@ export function renderObjectDetailView(state: AppState): string {
 
   return `
     <div class="breadcrumb">
-      <a href="#" data-nav="explorar">Itens</a> &raquo; ${escapeHtml(objeto.titulo)}
+      <a href="/explorar" data-nav="explorar">Itens</a> &raquo; ${escapeHtml(objeto.titulo)}
     </div>
 
     <div class="detail-card">
@@ -211,7 +211,7 @@ export function renderObjectDetailView(state: AppState): string {
         </div>
       </div>
 
-      ${objeto.imagem_url ? `<div class="detail-image"><img src="${escapeHtml(objeto.imagem_url)}" alt="${escapeHtml(objeto.titulo)}"></div>` : ""}
+      ${objectImage(objeto) ? `<div class="detail-image"><img src="${escapeHtml(objectImage(objeto))}" alt="${escapeHtml(objeto.titulo)}"></div>` : ""}
 
       <div class="detail-body">
         <div class="detail-info-grid">
@@ -291,7 +291,7 @@ function filterTag(state: AppState, tipo: string, label: string, extraClass: str
 }
 
 function renderPublicCard(objeto: Objeto): string {
-  const image = objeto.imagem_url;
+  const image = objectImage(objeto);
 
   return `
     <div class="card">
@@ -300,7 +300,7 @@ function renderPublicCard(objeto: Objeto): string {
         <span class="badge badge-categoria">${escapeHtml(objeto.categoria_nome || "Sem categoria")}</span>
         ${renderTypeOrStatusBadge(objeto)}
       </div>
-      <h3><a href="#" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></h3>
+      <h3><a href="/objetos/${objeto.id}" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></h3>
       <p class="card-desc">${escapeHtml(truncateWords(objeto.descricao, 20))}</p>
       <p class="card-meta">${escapeHtml(objeto.local_nome || "")}${objeto.local_nome ? " &middot; " : ""}${escapeHtml(formatDate(objeto.data_ocorrencia))}</p>
       <p class="card-meta">${escapeHtml(objeto.usuario?.nome || objeto.usuario?.username || "")}</p>
@@ -311,7 +311,7 @@ function renderPublicCard(objeto: Objeto): string {
 function renderMyObjectRow(objeto: Objeto): string {
   return `
     <tr>
-      <td><a href="#" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></td>
+      <td><a href="/objetos/${objeto.id}" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></td>
       <td>${renderTypeOrStatusBadge(objeto)} ${objeto.status !== "ativo" ? renderStatusBadge(objeto) : ""}</td>
       <td>${escapeHtml(objeto.categoria_nome || "-")}</td>
       <td>${escapeHtml(formatDate(objeto.data_ocorrencia))}</td>
@@ -336,7 +336,7 @@ function renderMatchCard(objeto: Objeto): string {
         <span class="badge badge-categoria">${escapeHtml(objeto.categoria_nome || "Sem categoria")}</span>
         ${renderTypeOrStatusBadge(objeto)}
       </div>
-      <h3><a href="#" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></h3>
+      <h3><a href="/objetos/${objeto.id}" data-view-object="${objeto.id}">${escapeHtml(objeto.titulo)}</a></h3>
       <p class="card-desc">${escapeHtml(truncateWords(objeto.descricao, 15))}</p>
       <p class="card-meta">${escapeHtml(objeto.local_nome || "")}${objeto.local_nome ? " &middot; " : ""}${escapeHtml(formatDate(objeto.data_ocorrencia))}</p>
     </div>
@@ -361,4 +361,8 @@ function truncateWords(value: string, limit: number): string {
 
 function formatLocal(nome: string, predio: string, andar: string): string {
   return [nome, predio, andar].filter(Boolean).join(" - ");
+}
+
+function objectImage(objeto: Objeto): string {
+  return objeto.imagem_exibicao || objeto.imagem_url || "";
 }

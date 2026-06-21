@@ -24,10 +24,10 @@ export function renderLoginView(): string {
       </section>
 
       <p class="auth-link">
-        <a href="#" data-nav="password-reset">Esqueceu sua senha?</a>
+        <a href="/redefinir-senha" data-nav="password-reset">Esqueceu sua senha?</a>
       </p>
       <p class="auth-link">
-        Ainda nao tem conta? <a href="#" data-nav="cadastro">Cadastre-se aqui</a>
+        Ainda nao tem conta? <a href="/cadastro" data-nav="cadastro">Cadastre-se aqui</a>
       </p>
     </section>
   `;
@@ -89,7 +89,7 @@ export function renderCadastroView(): string {
       </section>
 
       <p class="auth-link">
-        Ja tem uma conta? <a href="#" data-nav="login">Faca login aqui</a>
+        Ja tem uma conta? <a href="/login" data-nav="login">Faca login aqui</a>
       </p>
     </section>
   `;
@@ -144,7 +144,7 @@ export function renderPasswordResetView(state: AppState): string {
       </section>
 
       <p class="auth-link">
-        <a href="#" data-nav="login">Voltar para login</a>
+        <a href="/login" data-nav="login">Voltar para login</a>
       </p>
     </section>
   `;

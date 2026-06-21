@@ -54,7 +54,7 @@ export function renderPerfilView(state: AppState): string {
     <div class="form-card">
       <h2>Seguranca</h2>
       <p>Altere sua senha de acesso ao sistema.</p>
-      <a href="#" data-nav="trocar-senha" class="btn btn-primary">Trocar Senha</a>
+      <a href="/trocar-senha" data-nav="trocar-senha" class="btn btn-primary">Trocar Senha</a>
     </div>
 
     <hr class="separator">
@@ -62,7 +62,7 @@ export function renderPerfilView(state: AppState): string {
     <div class="danger-zone">
       <h2>Zona de Perigo</h2>
       <p>Ao desativar sua conta, voce perdera o acesso ao sistema e suas solicitacoes pendentes serao canceladas. Para reativa-la, entre em contato com o administrador.</p>
-      <a href="#" data-nav="desativar-conta" class="btn btn-danger">Desativar Minha Conta</a>
+      <a href="/desativar-conta" data-nav="desativar-conta" class="btn btn-danger">Desativar Minha Conta</a>
     </div>
   `;
 }
@@ -91,7 +91,7 @@ export function renderTrocarSenhaView(state: AppState): string {
       </div>
 
       <button type="submit" class="btn btn-primary">Alterar Senha</button>
-      <a href="#" data-nav="perfil" class="btn">Cancelar</a>
+      <a href="/perfil" data-nav="perfil" class="btn">Cancelar</a>
     </form>
   `;
 }
@@ -108,7 +108,7 @@ export function renderDesativarContaView(state: AppState): string {
       <form id="deactivateForm">
         <div class="form-actions">
           <button type="submit" class="btn btn-danger">Sim, desativar minha conta</button>
-          <a href="#" data-nav="perfil" class="btn btn-secondary">Cancelar</a>
+          <a href="/perfil" data-nav="perfil" class="btn btn-secondary">Cancelar</a>
         </div>
       </form>
     </div>

@@ -1,11 +1,12 @@
 import type { AppState, ViewName } from "../types.js";
 import { escapeHtml } from "../utils/format.js";
+import { pathForView } from "../utils/router.js";
 
 export function renderLayout(state: AppState, currentView: string): string {
   return `
     <header class="header">
       <div class="container header-inner">
-        <a href="#" class="logo" data-nav="inicio">
+        <a href="${pathForView("inicio")}" class="logo" data-nav="inicio">
           <span class="logo-icon">&#9782;</span>
           PUC Encontra
         </a>
@@ -27,13 +28,13 @@ export function renderLayout(state: AppState, currentView: string): string {
                     : ""
                 }
                 <div class="nav-user">
-                  <a href="#" class="btn-perfil" data-nav="perfil">${escapeHtml(state.user.first_name || state.user.username)}</a>
+                  <a href="${pathForView("perfil")}" class="btn-perfil" data-nav="perfil">${escapeHtml(state.user.first_name || state.user.username)}</a>
                   <a href="#" class="btn-logout" id="logoutButton">Sair</a>
                 </div>
               `
               : `
-                <a href="#" class="btn-login" data-nav="login">Entrar</a>
-                <a href="#" class="btn-register" data-nav="cadastro">Cadastrar</a>
+                <a href="${pathForView("login")}" class="btn-login" data-nav="login">Entrar</a>
+                <a href="${pathForView("cadastro")}" class="btn-register" data-nav="cadastro">Cadastrar</a>
               `
           }
         </nav>
@@ -64,7 +65,7 @@ function navLink(state: AppState, view: ViewName, label: string): string {
     (view === "usuarios" && state.view === "usuario-form");
 
   return `
-    <a href="#" data-nav="${view}" class="${active ? "nav-active" : ""}">
+    <a href="${pathForView(view)}" data-nav="${view}" class="${active ? "nav-active" : ""}">
       ${escapeHtml(label)}
     </a>
   `;
