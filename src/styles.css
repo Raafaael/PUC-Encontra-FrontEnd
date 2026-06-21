@@ -671,6 +671,11 @@ textarea {
   outline: none;
 }
 
+input[type="file"] {
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
 textarea {
   resize: vertical;
 }

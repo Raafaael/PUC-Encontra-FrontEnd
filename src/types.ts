@@ -51,7 +51,9 @@ export type Objeto = {
   data_ocorrencia: string;
   ponto_referencia: string;
   contato: string;
+  imagem: string | null;
   imagem_url: string;
+  imagem_exibicao: string | null;
   criado_em: string;
   atualizado_em: string;
 };
