@@ -32,6 +32,7 @@ export function pathForView(view: ViewName): string {
 }
 
 export function pathForState(state: Pick<AppState, "view" | "selectedObjectId">): string {
+  // Detalhes de objeto usam URL propria para permitir refresh e compartilhamento do link.
   if (state.view === "objeto-detail" && state.selectedObjectId) {
     return `/objetos/${state.selectedObjectId}`;
   }
@@ -46,6 +47,7 @@ export function routeFromPath(pathname: string): Route {
     return { view: "objeto-detail", selectedObjectId: Number(objectMatch[1]) };
   }
   if (path === "/objetos") {
+    // /objetos sem id funciona como entrada publica para a listagem.
     return { view: "explorar", selectedObjectId: null };
   }
 

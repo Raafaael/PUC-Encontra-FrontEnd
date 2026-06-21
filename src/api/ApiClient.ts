@@ -21,6 +21,7 @@ export class ApiClient {
     const hasBody = options.body !== undefined;
     const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
 
+    // FormData deixa o navegador definir o boundary correto para upload de imagem.
     if (hasBody && !isFormData && !headers.has("Content-Type")) {
       headers.set("Content-Type", "application/json");
     }

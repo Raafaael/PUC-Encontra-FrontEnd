@@ -39,6 +39,7 @@ export class PucEncontraApp {
   }
 
   private applyBrowserRoute(): void {
+    // Permite abrir /login, /explorar ou /objetos/:id diretamente pelo navegador.
     const route = routeFromPath(window.location.pathname);
     this.state.view = route.view;
     this.state.selectedObjectId = route.selectedObjectId;
@@ -92,6 +93,7 @@ export class PucEncontraApp {
       if (this.state.filters.categoria) params.set("categoria", this.state.filters.categoria);
       if (this.state.filters.local) params.set("local", this.state.filters.local);
 
+      // Carrega dados base em paralelo para manter filtros e selects sempre atualizados.
       const [categorias, locais, objetos] = await Promise.all([
         this.api.request<Paginated<Categoria> | Categoria[]>("/categorias/"),
         this.api.request<Paginated<Local> | Local[]>("/locais/"),
@@ -181,6 +183,7 @@ export class PucEncontraApp {
   private navigate(next: ViewName): void {
     const hasSession = Boolean(this.state.user || this.state.token);
 
+    // Impede acesso visual a telas privadas antes de confirmar sessao/autorizacao.
     if (hasSession && (next === "inicio" || next === "login" || next === "cadastro")) {
       next = "dashboard";
     }
