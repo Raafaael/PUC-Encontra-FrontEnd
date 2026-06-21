@@ -176,19 +176,19 @@ Fluxo de administrador:
 
 Pagina inicial:
 
-![Pagina inicial](docs/images/01-inicio.png)
+![Pagina inicial](image/README/01-inicio.png)
 
 Listagem publica:
 
-![Listagem publica](docs/images/02-explorar.png)
+![Listagem publica](image/README/02-explorar.png)
 
 Dashboard administrativo:
 
-![Dashboard administrativo](docs/images/03-dashboard-admin.png)
+![Dashboard administrativo](image/README/03-dashboard-admin.png)
 
 Formulario com upload de imagem:
 
-![Formulario com upload](docs/images/04-formulario-upload.png)
+![Formulario com upload](image/README/04-formulario-upload.png)
 
 ## O Que Foi Testado e Funcionou
 
