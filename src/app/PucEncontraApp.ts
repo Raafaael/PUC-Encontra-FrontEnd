@@ -9,6 +9,8 @@ import { formData } from "../utils/forms.js";
 import { unwrapResults } from "../utils/pagination.js";
 import { pathForState, routeFromPath } from "../utils/router.js";
 
+type BaseData = [Categoria[], Local[], Objeto[]];
+
 export class PucEncontraApp {
   private readonly state: AppState;
   private readonly api: ApiClient;
@@ -74,6 +76,7 @@ export class PucEncontraApp {
       localStorage.setItem(STORAGE_KEYS.token, token);
     } else {
       localStorage.removeItem(STORAGE_KEYS.token);
+      localStorage.removeItem(STORAGE_KEYS.bootstrap);
       this.setUser(null);
     }
   }
@@ -105,6 +108,7 @@ export class PucEncontraApp {
     this.state.loading = true;
     this.state.sessionRestoreFailed = false;
     this.render();
+    let baseDataPromise = this.loadBaseData();
 
     try {
       if (this.state.token) {
@@ -113,34 +117,27 @@ export class PucEncontraApp {
           if (this.state.view === "inicio" || this.state.view === "login" || this.state.view === "cadastro") {
             this.setView("dashboard", true);
           }
+          this.render();
         } catch (error) {
           if (this.isAuthFailure(error)) {
+            await baseDataPromise.catch(() => null);
             this.setToken(null);
             this.state.meusObjetos = [];
             this.state.usuarios = [];
             if (this.isAuthenticatedView(this.state.view)) {
               this.setView("login", true);
             }
+            baseDataPromise = this.loadBaseData();
           } else {
-            this.state.meusObjetos = [];
-            this.state.usuarios = [];
             this.state.sessionRestoreFailed = true;
             this.setNotice("Nao foi possivel validar sua sessao agora.", "error");
+            await this.tryApplyBaseData(baseDataPromise);
             return;
           }
         }
       }
 
-      // Carrega dados base em paralelo para manter filtros e selects sempre atualizados.
-      const [categorias, locais, objetos] = await Promise.all([
-        this.requestAll<Categoria>("/categorias/"),
-        this.requestAll<Local>("/locais/"),
-        this.requestAll<Objeto>("/objetos/"),
-      ]);
-
-      this.state.categorias = categorias;
-      this.state.locais = locais;
-      this.state.objetos = objetos;
+      await this.applyBaseData(baseDataPromise);
 
       if (this.state.user) {
         try {
@@ -162,12 +159,52 @@ export class PucEncontraApp {
         this.state.meusObjetos = [];
         this.state.usuarios = [];
       }
+      this.saveBootstrapCache();
     } catch (error) {
       this.setNotice(error instanceof Error ? error.message : "Falha ao carregar dados.", "error");
     } finally {
       this.state.loading = false;
       this.render();
     }
+  }
+
+  private async loadBaseData(): Promise<BaseData> {
+    return Promise.all([
+      this.requestAll<Categoria>("/categorias/"),
+      this.requestAll<Local>("/locais/"),
+      this.requestAll<Objeto>("/objetos/"),
+    ]);
+  }
+
+  private async applyBaseData(baseDataPromise: Promise<BaseData>): Promise<void> {
+    const [categorias, locais, objetos] = await baseDataPromise;
+    this.state.categorias = categorias;
+    this.state.locais = locais;
+    this.state.objetos = objetos;
+    this.saveBootstrapCache();
+    this.render();
+  }
+
+  private async tryApplyBaseData(baseDataPromise: Promise<BaseData>): Promise<void> {
+    try {
+      await this.applyBaseData(baseDataPromise);
+    } catch {
+      // Mantem os dados em cache na tela quando a API de producao falha temporariamente.
+    }
+  }
+
+  private saveBootstrapCache(): void {
+    localStorage.setItem(
+      STORAGE_KEYS.bootstrap,
+      JSON.stringify({
+        categorias: this.state.categorias,
+        locais: this.state.locais,
+        objetos: this.state.objetos,
+        meusObjetos: this.state.user ? this.state.meusObjetos : [],
+        usuarios: this.state.user?.is_staff ? this.state.usuarios : [],
+        userId: this.state.user?.id ?? null,
+      }),
+    );
   }
 
   private async requestAll<T>(path: string): Promise<T[]> {

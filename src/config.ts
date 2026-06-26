@@ -13,6 +13,7 @@ export const DEFAULT_API_BASE_URL = runtimeApiBaseUrl || "http://127.0.0.1:8000/
 export const STORAGE_KEYS = {
   token: "puc-token",
   user: "puc-user",
+  bootstrap: "puc-bootstrap",
 } as const;
 
 export const FALLBACK_OBJECT_IMAGE =
