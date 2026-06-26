@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && node scripts/build-assets.mjs",
+    "build": "tsc && tsc -p tsconfig.scripts.json && node .build-scripts/build-assets.js",
     "watch": "tsc --watch",
     "serve": "serve . --single --listen tcp://127.0.0.1:5173",
     "dev": "npm run build && npm run serve"
   },
   "devDependencies": {
+    "@types/node": "^20.19.0",
     "serve": "^14.2.4",
     "typescript": "^5.5.0"
   }

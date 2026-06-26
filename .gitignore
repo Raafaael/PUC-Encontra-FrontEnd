@@ -217,6 +217,7 @@ __marimo__/
 # Node / Vite
 node_modules/
 dist/
+.build-scripts/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

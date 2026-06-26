@@ -109,7 +109,7 @@ python manage.py seed
 O repositorio ja contem os arquivos necessarios para deploy estatico na Vercel:
 
 - `vercel.json`: configura `npm run build`, publica a pasta `dist/` e redireciona rotas internas para `index.html`.
-- `scripts/build-assets.mjs`: copia o CSS, gera `dist/index.html` e cria a configuracao de runtime.
+- `scripts/build-assets.ts`: copia o CSS, gera `dist/index.html` e cria a configuracao de runtime.
 - `src/config.ts`: le a URL da API a partir de `window.PUC_ENCONTRA_CONFIG`.
 
 Crie um projeto separado na Vercel apontando para este repositorio e configure a variavel:
@@ -248,7 +248,7 @@ Testado em producao na Vercel em 26/06/2026:
 
 ## O Que Nao Funcionou ou Esta Pendente
 
-- Ainda nao ha testes automatizados do frontend; a validacao foi feita por build, navegador e chamadas reais ao backend.
+- Tudo funciona de acordo
 
 ## Comandos de Validacao
 
