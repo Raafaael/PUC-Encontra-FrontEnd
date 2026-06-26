@@ -1,4 +1,14 @@
-export const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000/api";
+declare global {
+  interface Window {
+    PUC_ENCONTRA_CONFIG?: {
+      apiBaseUrl?: string;
+    };
+  }
+}
+
+const runtimeApiBaseUrl = window.PUC_ENCONTRA_CONFIG?.apiBaseUrl?.trim().replace(/\/+$/, "");
+
+export const DEFAULT_API_BASE_URL = runtimeApiBaseUrl || "http://127.0.0.1:8000/api";
 
 export const STORAGE_KEYS = {
   token: "puc-token",

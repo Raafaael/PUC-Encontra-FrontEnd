@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && node -e \"require('fs').copyFileSync('src/styles.css','dist/styles.css')\"",
+    "build": "tsc && node scripts/build-assets.mjs",
     "watch": "tsc --watch",
     "serve": "serve . --single --listen tcp://127.0.0.1:5173",
     "dev": "npm run build && npm run serve"

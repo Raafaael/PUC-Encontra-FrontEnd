@@ -107,6 +107,30 @@ python manage.py migrate
 python manage.py seed
 ```
 
+## Publicacao na Vercel
+
+O repositorio ja contem os arquivos necessarios para deploy estatico na Vercel:
+
+- `vercel.json`: configura `npm run build`, publica a pasta `dist/` e redireciona rotas internas para `index.html`.
+- `scripts/build-assets.mjs`: copia o CSS, gera `dist/index.html` e cria a configuracao de runtime.
+- `src/config.ts`: le a URL da API a partir de `window.PUC_ENCONTRA_CONFIG`.
+
+Crie um projeto separado na Vercel apontando para este repositorio e configure a variavel:
+
+```env
+PUC_ENCONTRA_API_URL=https://SEU-BACKEND.vercel.app/api
+```
+
+O valor nao deve terminar com barra. Se terminar, o build remove a barra automaticamente.
+
+Ordem recomendada:
+
+1. Publique primeiro o backend.
+2. Confirme que `https://SEU-BACKEND.vercel.app/api/docs/` abre.
+3. Configure `PUC_ENCONTRA_API_URL` no projeto do frontend.
+4. Publique o frontend.
+5. Volte ao backend e ajuste `CORS_ALLOWED_ORIGINS` para a URL final do frontend.
+
 ## Usuarios de Teste
 
 Todos os usuarios criados pelo seed usam a senha:
@@ -212,7 +236,8 @@ Testado localmente em 21/06/2026:
 ## O Que Nao Funcionou ou Esta Pendente
 
 - Publicacao em provedor web ainda nao foi realizada.
-- A URL da API esta fixa em `src/config.ts` como `http://127.0.0.1:8000/api`; para producao, deve ser alterada para a URL publicada do backend.
+- O frontend ja aceita URL de producao via `PUC_ENCONTRA_API_URL`, mas essa variavel precisa ser preenchida na Vercel depois que o backend for publicado.
+- Upload de imagem em producao depende de storage persistente no backend. Localmente funciona com `SERVE_MEDIA=True`.
 - Ainda nao ha testes automatizados do frontend; a validacao foi feita por build, navegador e chamadas reais ao backend.
 - O envio real de e-mail para recuperacao de senha depende da configuracao futura do backend.
 
