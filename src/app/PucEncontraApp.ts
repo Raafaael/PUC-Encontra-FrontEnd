@@ -43,6 +43,15 @@ export class PucEncontraApp {
     const route = routeFromPath(window.location.pathname);
     this.state.view = route.view;
     this.state.selectedObjectId = route.selectedObjectId;
+    if (route.view === "password-reset") {
+      const params = new URLSearchParams(window.location.search);
+      const uid = params.get("uid") || "";
+      const token = params.get("token") || "";
+      if (uid && token) {
+        this.state.resetDraft = { uid, token };
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    }
   }
 
   private setView(view: ViewName, replace = false): void {

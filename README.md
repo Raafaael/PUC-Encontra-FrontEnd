@@ -4,16 +4,13 @@ Frontend do PUC-Encontra, uma plataforma web de achados e perdidos para a PUC. A
 
 ## Integrantes
 
-- Dante Navaza 2321406
-- Rafael Soares
+- Dante Navaza - 2321406
+- Rafael Soares - 2320470
 
 ## Links
 
-- Repositorio do frontend: [https://github.com/Raafaael/PUC-Encontra-FrontEnd](https://github.com/Raafaael/PUC-Encontra-FrontEnd)
-- Repositorio do backend: [https://github.com/Raafaael/PUC-Encontra-API](https://github.com/Raafaael/PUC-Encontra-API)
-- Frontend local: [http://127.0.0.1:5173/](http://127.0.0.1:5173/)
-- Backend local: [http://127.0.0.1:8000/api/](http://127.0.0.1:8000/api/)
-- Site frontend publicado: COLOCAR LINK PUBLICO
+- Site frontend publicado: [https://puc-encontra-frontend.vercel.app/](https://puc-encontra-frontend.vercel.app/)
+- Site backend publicado: [https://puc-encontra-api.vercel.app/](https://puc-encontra-api.vercel.app/)
 
 ## Escopo
 
@@ -33,7 +30,7 @@ Funcionalidades implementadas:
 - Visualizacao detalhada de objeto.
 - Lista de "Meus Registros".
 - Troca de senha.
-- Recuperacao de senha.
+- Recuperacao de senha por link enviado por e-mail.
 - Edicao de perfil.
 - Desativacao de conta.
 - Area administrativa para aprovar ou rejeitar objetos pendentes.
@@ -151,7 +148,7 @@ aluno2  - Usuario comum
 
 Fluxo publico:
 
-1. Abra DPS COLOCAR LINK PUBLICO DO SITE!!!.
+1. Abra [https://puc-encontra-frontend.vercel.app/](https://puc-encontra-frontend.vercel.app/).
 2. Clique em "Itens" ou acesse `/explorar`.
 3. Use os filtros para procurar objetos por texto, categoria, local ou tipo.
 4. Clique em um objeto para abrir a pagina de detalhes.
@@ -165,6 +162,7 @@ Fluxo de usuario comum:
 5. Clique em "Registrar Solicitacao" para cadastrar um objeto perdido ou encontrado.
 6. Selecione uma imagem local do computador no campo "Imagem do computador".
 7. Acesse "Perfil" para editar dados, trocar senha ou desativar a conta.
+8. Em "Esqueceu sua senha?", informe o e-mail cadastrado e abra o link recebido para redefinir a senha.
 
 Fluxo de administrador:
 
@@ -189,7 +187,7 @@ Fluxo de administrador:
 /objetos/{id}     - Detalhe de objeto
 /perfil           - Perfil
 /trocar-senha     - Troca de senha
-/redefinir-senha  - Recuperacao de senha
+/redefinir-senha  - Recuperacao de senha; tambem aceita `?uid=...&token=...`
 /aprovacoes       - Area administrativa
 /categorias       - CRUD de categorias
 /locais           - CRUD de locais
@@ -233,13 +231,22 @@ Testado localmente em 21/06/2026:
 - Telas de CRUD administrativo estao acessiveis para admin.
 - Usuario comum nao acessa area administrativa.
 
+Testado em producao na Vercel em 26/06/2026:
+
+- Frontend publicado abre em `https://puc-encontra-frontend.vercel.app/`.
+- Rotas diretas `/login`, `/explorar`, `/meus-registros` e `/objetos/1` retornaram `200`.
+- `runtime-config.js` aponta para `https://puc-encontra-api.vercel.app/api`.
+- CSS e JavaScript de producao carregaram corretamente.
+- CORS da API aceitou a origem `https://puc-encontra-frontend.vercel.app`.
+- Login com `admin` e `aluno1` funcionou via API publicada.
+- Smoke test de CRUD em producao criou, editou, marcou como resolvido e apagou um objeto temporario.
+- Smoke test administrativo em producao criou e removeu categoria/local temporarios.
+
 ## O Que Nao Funcionou ou Esta Pendente
 
-- Publicacao em provedor web ainda nao foi realizada.
-- O frontend ja aceita URL de producao via `PUC_ENCONTRA_API_URL`, mas essa variavel precisa ser preenchida na Vercel depois que o backend for publicado.
 - Upload de imagem em producao depende de storage persistente no backend. Localmente funciona com `SERVE_MEDIA=True`.
 - Ainda nao ha testes automatizados do frontend; a validacao foi feita por build, navegador e chamadas reais ao backend.
-- O envio real de e-mail para recuperacao de senha depende da configuracao futura do backend.
+- O envio real de e-mail para recuperacao de senha depende das variaveis SMTP configuradas no backend publicado.
 
 ## Comandos de Validacao
 
@@ -251,9 +258,9 @@ npm run serve
 Com o backend rodando, acessar:
 
 ```text
-"DEPOIS COLOCAR LINK
+https://puc-encontra-frontend.vercel.app/
 ```
 
 ## Observacoes Para Entrega
 
-Para atender integralmente ao PDF, antes do envio no EaD ainda e necessario publicar o frontend em um provedor web e substituir o item "Site frontend publicado" pelo link final.
+O frontend esta publicado na Vercel em [https://puc-encontra-frontend.vercel.app/](https://puc-encontra-frontend.vercel.app/) e consome a API publicada em [https://puc-encontra-api.vercel.app/](https://puc-encontra-api.vercel.app/).
