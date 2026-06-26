@@ -8,13 +8,8 @@ export function renderLocked(): string {
 }
 
 export function renderSessionRestore(hasError = false): string {
-  return `
-    <section class="empty-state">
-      <i data-icon="${hasError ? "wifi-off" : "refresh-cw"}"></i>
-      <h2>${hasError ? "Sessao nao validada" : "Restaurando sessao"}</h2>
-      ${hasError ? "<p>Nao foi possivel confirmar sua sessao agora. Recarregue a pagina em alguns segundos.</p>" : ""}
-    </section>
-  `;
+  void hasError;
+  return "";
 }
 
 export function renderEmptyState(): string {
