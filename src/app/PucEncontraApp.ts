@@ -95,50 +95,51 @@ export class PucEncontraApp {
     this.render();
 
     try {
-      const params = new URLSearchParams();
-      if (this.state.filters.search) params.set("search", this.state.filters.search);
-      if (this.state.filters.tipo && this.state.filters.tipo !== "resolvido") params.set("tipo", this.state.filters.tipo);
-      if (this.state.filters.tipo === "resolvido") params.set("status", "resolvido");
-      if (this.state.filters.categoria) params.set("categoria", this.state.filters.categoria);
-      if (this.state.filters.local) params.set("local", this.state.filters.local);
-
-      // Carrega dados base em paralelo para manter filtros e selects sempre atualizados.
-      const [categorias, locais, objetos] = await Promise.all([
-        this.api.request<Paginated<Categoria> | Categoria[]>("/categorias/"),
-        this.api.request<Paginated<Local> | Local[]>("/locais/"),
-        this.api.request<Paginated<Objeto> | Objeto[]>(`/objetos/${params.toString() ? `?${params}` : ""}`),
-      ]);
-
-      this.state.categorias = unwrapResults(categorias);
-      this.state.locais = unwrapResults(locais);
-      this.state.objetos = unwrapResults(objetos);
-
       if (this.state.token) {
         try {
           this.state.user = await this.api.request<Usuario>("/auth/me/");
           if (this.state.view === "inicio" || this.state.view === "login" || this.state.view === "cadastro") {
             this.setView("dashboard", true);
           }
-          const meus = await this.api.request<Paginated<Objeto> | Objeto[]>("/objetos/meus/");
-          this.state.meusObjetos = unwrapResults(meus);
-          if (this.state.user.is_staff) {
-            try {
-              const usuarios = await this.api.request<Paginated<Usuario> | Usuario[]>("/usuarios/");
-              this.state.usuarios = unwrapResults(usuarios);
-            } catch {
-              this.state.usuarios = [];
-            }
-          } else {
-            this.state.usuarios = [];
-          }
         } catch {
           this.setToken(null);
           this.state.user = null;
           this.state.meusObjetos = [];
           this.state.usuarios = [];
+          if (this.isAuthenticatedView(this.state.view)) {
+            this.setView("login", true);
+          }
+        }
+      }
+
+      // Carrega dados base em paralelo para manter filtros e selects sempre atualizados.
+      const [categorias, locais, objetos] = await Promise.all([
+        this.requestAll<Categoria>("/categorias/"),
+        this.requestAll<Local>("/locais/"),
+        this.requestAll<Objeto>("/objetos/"),
+      ]);
+
+      this.state.categorias = categorias;
+      this.state.locais = locais;
+      this.state.objetos = objetos;
+
+      if (this.state.user) {
+        try {
+          this.state.meusObjetos = await this.requestAll<Objeto>("/objetos/meus/");
+        } catch {
+          this.state.meusObjetos = [];
+        }
+
+        if (this.state.user.is_staff) {
+          try {
+            this.state.usuarios = await this.requestAll<Usuario>("/usuarios/");
+          } catch {
+            this.state.usuarios = [];
+          }
+        } else {
+          this.state.usuarios = [];
         }
       } else {
-        this.state.user = null;
         this.state.meusObjetos = [];
         this.state.usuarios = [];
       }
@@ -148,6 +149,26 @@ export class PucEncontraApp {
       this.state.loading = false;
       this.render();
     }
+  }
+
+  private async requestAll<T>(path: string): Promise<T[]> {
+    let currentPath = path;
+    const rows: T[] = [];
+
+    while (currentPath) {
+      const data = await this.api.request<Paginated<T> | T[]>(currentPath);
+      if (Array.isArray(data)) return rows.concat(data);
+
+      rows.push(...unwrapResults(data));
+      currentPath = data.next ? this.apiPathFromUrl(data.next) : "";
+    }
+
+    return rows;
+  }
+
+  private apiPathFromUrl(url: string): string {
+    const parsed = new URL(url);
+    return `${parsed.pathname.replace(/^\/api/, "")}${parsed.search}`;
   }
 
   private bindEvents(): void {
@@ -248,7 +269,7 @@ export class PucEncontraApp {
     document.querySelectorAll<HTMLButtonElement>("[data-public-filter]").forEach((button) => {
       button.addEventListener("click", () => {
         this.state.filters.tipo = button.dataset.publicFilter || "";
-        void this.refreshData();
+        this.render();
       });
     });
 
@@ -384,7 +405,7 @@ export class PucEncontraApp {
     this.setNotice("Sessao encerrada.", "success");
   }
 
-  private async handleFilter(event: SubmitEvent): Promise<void> {
+  private handleFilter(event: SubmitEvent): void {
     event.preventDefault();
     const data = formData(event.currentTarget as HTMLFormElement);
     this.state.filters = {
@@ -393,7 +414,7 @@ export class PucEncontraApp {
       categoria: data.categoria,
       local: data.local,
     };
-    await this.refreshData();
+    this.render();
   }
 
   private handleMyFilter(event: SubmitEvent): void {
@@ -423,9 +444,9 @@ export class PucEncontraApp {
     this.render();
   }
 
-  private async clearFilters(): Promise<void> {
+  private clearFilters(): void {
     this.state.filters = { search: "", tipo: "", categoria: "", local: "" };
-    await this.refreshData();
+    this.render();
   }
 
   private async handleObjectSubmit(event: SubmitEvent): Promise<void> {

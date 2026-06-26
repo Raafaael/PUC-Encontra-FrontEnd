@@ -13,8 +13,13 @@ import { renderCadastroView, renderLoginView, renderPasswordResetView } from "./
 import { renderInicioView } from "./home.js";
 import { renderExplorarView, renderMeusView, renderObjectDetailView, renderObjectFormView } from "./objects.js";
 import { renderDesativarContaView, renderPerfilView, renderTrocarSenhaView } from "./profile.js";
+import { renderSessionRestore } from "./shared.js";
 
 export function renderCurrentView(state: AppState): string {
+  if (state.token && !state.user && state.loading && state.view !== "password-reset") {
+    return renderSessionRestore();
+  }
+
   if (state.view === "inicio") return renderInicioView(state);
   if (state.view === "login") return renderLoginView();
   if (state.view === "cadastro") return renderCadastroView();
