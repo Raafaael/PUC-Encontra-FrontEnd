@@ -30,7 +30,7 @@ Funcionalidades implementadas:
 - Visualizacao detalhada de objeto.
 - Lista de "Meus Registros".
 - Troca de senha.
-- Recuperacao de senha por link enviado por e-mail.
+- Recuperacao de senha por link/token gerado no terminal do backend.
 - Edicao de perfil.
 - Desativacao de conta.
 - Area administrativa para aprovar ou rejeitar objetos pendentes.
@@ -162,7 +162,7 @@ Fluxo de usuario comum:
 5. Clique em "Registrar Solicitacao" para cadastrar um objeto perdido ou encontrado.
 6. Selecione uma imagem local do computador no campo "Imagem do computador".
 7. Acesse "Perfil" para editar dados, trocar senha ou desativar a conta.
-8. Em "Esqueceu sua senha?", informe o e-mail cadastrado e abra o link recebido para redefinir a senha.
+8. Em "Esqueceu sua senha?", informe o e-mail cadastrado e use o link/token impresso no terminal do backend para redefinir a senha.
 
 Fluxo de administrador:
 
@@ -214,7 +214,7 @@ Formulario com upload de imagem:
 
 ## O Que Foi Testado e Funcionou
 
-Testado localmente em 21/06/2026:
+Testado localmente em 26/06/2026:
 
 - `npm install` instalado sem vulnerabilidades reportadas.
 - `npm run build` executado com sucesso.
@@ -225,9 +225,11 @@ Testado localmente em 21/06/2026:
   - `/objetos/1`
 - Login de administrador funcionou.
 - Tela de dashboard administrativo abriu.
+- Tela de recuperacao de senha orienta a gerar o link/token no terminal do backend.
 - Formulario de objeto mostra apenas upload de imagem local.
 - O backend aceitou upload de imagem e retornou URL em `/media/...`.
 - A imagem enviada abriu com `200 image/png`.
+- Criacao de item, listagem em "Meus Registros" e filtros por busca, tipo e devolvidos foram validados contra a API local.
 - Telas de CRUD administrativo estao acessiveis para admin.
 - Usuario comum nao acessa area administrativa.
 
@@ -247,7 +249,6 @@ Testado em producao na Vercel em 26/06/2026:
 ## O Que Nao Funcionou ou Esta Pendente
 
 - Ainda nao ha testes automatizados do frontend; a validacao foi feita por build, navegador e chamadas reais ao backend.
-- O fluxo de recuperacao de senha foi implementado, mas a entrega real do e-mail na caixa de entrada depende das variaveis SMTP corretas no backend publicado e de um remetente validado no provedor SMTP.
 
 ## Comandos de Validacao
 
@@ -259,7 +260,7 @@ npm run serve
 Com o backend rodando, acessar:
 
 ```text
-https://puc-encontra-frontend.vercel.app/
+http://127.0.0.1:5173/
 ```
 
 ## Observacoes Para Entrega

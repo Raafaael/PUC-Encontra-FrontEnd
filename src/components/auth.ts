@@ -105,7 +105,7 @@ export function renderPasswordResetView(state: AppState): string {
         ${
           hasDraft
             ? "Informe sua nova senha para concluir a redefinicao."
-            : "Digite seu e-mail para receber as instrucoes de redefinicao."
+            : "Digite seu e-mail cadastrado para gerar o link no terminal do backend."
         }
       </p>
 
@@ -137,7 +137,7 @@ export function renderPasswordResetView(state: AppState): string {
                   <input type="email" name="email" id="id_email_reset" autocomplete="email" required autofocus />
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-full">Enviar Instrucoes</button>
+                <button type="submit" class="btn btn-primary btn-full">Gerar Link</button>
               </form>
             `
         }
