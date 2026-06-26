@@ -36,5 +36,6 @@ export function createInitialState(): AppState {
     },
     notice: null,
     loading: false,
+    sessionRestoreFailed: false,
   };
 }

@@ -1,4 +1,4 @@
-import { ApiClient } from "../api/ApiClient.js";
+import { ApiClient, ApiError } from "../api/ApiClient.js";
 import { DEFAULT_API_BASE_URL, STORAGE_KEYS } from "../config.js";
 import { renderLayout } from "../components/layout.js";
 import { renderCurrentView } from "../components/views.js";
@@ -69,6 +69,7 @@ export class PucEncontraApp {
 
   private setToken(token: string | null): void {
     this.state.token = token;
+    this.state.sessionRestoreFailed = false;
     if (token) {
       localStorage.setItem(STORAGE_KEYS.token, token);
     } else {
@@ -92,6 +93,7 @@ export class PucEncontraApp {
 
   private async refreshData(): Promise<void> {
     this.state.loading = true;
+    this.state.sessionRestoreFailed = false;
     this.render();
 
     try {
@@ -101,13 +103,22 @@ export class PucEncontraApp {
           if (this.state.view === "inicio" || this.state.view === "login" || this.state.view === "cadastro") {
             this.setView("dashboard", true);
           }
-        } catch {
-          this.setToken(null);
-          this.state.user = null;
-          this.state.meusObjetos = [];
-          this.state.usuarios = [];
-          if (this.isAuthenticatedView(this.state.view)) {
-            this.setView("login", true);
+        } catch (error) {
+          if (this.isAuthFailure(error)) {
+            this.setToken(null);
+            this.state.user = null;
+            this.state.meusObjetos = [];
+            this.state.usuarios = [];
+            if (this.isAuthenticatedView(this.state.view)) {
+              this.setView("login", true);
+            }
+          } else {
+            this.state.user = null;
+            this.state.meusObjetos = [];
+            this.state.usuarios = [];
+            this.state.sessionRestoreFailed = true;
+            this.setNotice("Nao foi possivel validar sua sessao agora.", "error");
+            return;
           }
         }
       }
@@ -167,8 +178,12 @@ export class PucEncontraApp {
   }
 
   private apiPathFromUrl(url: string): string {
-    const parsed = new URL(url);
+    const parsed = new URL(url, DEFAULT_API_BASE_URL);
     return `${parsed.pathname.replace(/^\/api/, "")}${parsed.search}`;
+  }
+
+  private isAuthFailure(error: unknown): boolean {
+    return error instanceof ApiError && (error.status === 401 || error.status === 403);
   }
 
   private bindEvents(): void {

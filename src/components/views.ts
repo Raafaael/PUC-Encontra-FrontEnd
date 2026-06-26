@@ -16,8 +16,8 @@ import { renderDesativarContaView, renderPerfilView, renderTrocarSenhaView } fro
 import { renderSessionRestore } from "./shared.js";
 
 export function renderCurrentView(state: AppState): string {
-  if (state.token && !state.user && state.loading && state.view !== "password-reset") {
-    return renderSessionRestore();
+  if (state.token && !state.user && (state.loading || state.sessionRestoreFailed) && state.view !== "password-reset") {
+    return renderSessionRestore(state.sessionRestoreFailed);
   }
 
   if (state.view === "inicio") return renderInicioView(state);

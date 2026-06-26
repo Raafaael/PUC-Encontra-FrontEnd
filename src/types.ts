@@ -126,4 +126,5 @@ export type AppState = {
   resetDraft: ResetDraft;
   notice: { message: string; tone: NoticeTone } | null;
   loading: boolean;
+  sessionRestoreFailed: boolean;
 };
