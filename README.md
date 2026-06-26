@@ -241,12 +241,13 @@ Testado em producao na Vercel em 26/06/2026:
 - Login com `admin` e `aluno1` funcionou via API publicada.
 - Smoke test de CRUD em producao criou, editou, marcou como resolvido e apagou um objeto temporario.
 - Smoke test administrativo em producao criou e removeu categoria/local temporarios.
+- Upload de imagem em producao funcionou via API publicada, salvou no Cloudinary e retornou URL publica.
+- A imagem enviada em producao abriu publicamente com `200 image/png`.
 
 ## O Que Nao Funcionou ou Esta Pendente
 
-- Upload de imagem em producao depende de storage persistente no backend. Localmente funciona com `SERVE_MEDIA=True`.
 - Ainda nao ha testes automatizados do frontend; a validacao foi feita por build, navegador e chamadas reais ao backend.
-- O envio real de e-mail para recuperacao de senha depende das variaveis SMTP configuradas no backend publicado.
+- O fluxo de recuperacao de senha foi implementado, mas a entrega real do e-mail na caixa de entrada depende das variaveis SMTP corretas no backend publicado e de um remetente validado no provedor SMTP.
 
 ## Comandos de Validacao
 
