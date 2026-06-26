@@ -1011,23 +1011,6 @@ textarea:focus {
   font-size: 1.1rem;
 }
 
-.loading-line {
-  height: 4px;
-  margin-bottom: 16px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--border);
-}
-
-.loading-line::before {
-  display: block;
-  width: 38%;
-  height: 100%;
-  background: var(--accent);
-  content: "";
-  animation: loading 1s ease-in-out infinite;
-}
-
 .filter-tags {
   display: flex;
   gap: 8px;
@@ -1265,15 +1248,6 @@ textarea:focus {
 
 .text-muted {
   color: var(--text-light);
-}
-
-@keyframes loading {
-  0% {
-    transform: translateX(-110%);
-  }
-  100% {
-    transform: translateX(280%);
-  }
 }
 
 @media (max-width: 900px) {

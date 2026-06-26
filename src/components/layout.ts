@@ -44,7 +44,6 @@ export function renderLayout(state: AppState, currentView: string): string {
     <main class="main-content">
       <div class="container">
         <div id="notice" class="alert ${state.notice ? `alert-${state.notice.tone}` : ""}">${escapeHtml(state.notice?.message)}</div>
-        ${state.loading ? `<div class="loading-line"></div>` : ""}
         ${currentView}
       </div>
     </main>
