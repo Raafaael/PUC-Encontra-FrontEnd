@@ -74,6 +74,16 @@ export class PucEncontraApp {
       localStorage.setItem(STORAGE_KEYS.token, token);
     } else {
       localStorage.removeItem(STORAGE_KEYS.token);
+      this.setUser(null);
+    }
+  }
+
+  private setUser(user: Usuario | null): void {
+    this.state.user = user;
+    if (user) {
+      localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.user);
     }
   }
 
@@ -99,21 +109,19 @@ export class PucEncontraApp {
     try {
       if (this.state.token) {
         try {
-          this.state.user = await this.api.request<Usuario>("/auth/me/");
+          this.setUser(await this.api.request<Usuario>("/auth/me/"));
           if (this.state.view === "inicio" || this.state.view === "login" || this.state.view === "cadastro") {
             this.setView("dashboard", true);
           }
         } catch (error) {
           if (this.isAuthFailure(error)) {
             this.setToken(null);
-            this.state.user = null;
             this.state.meusObjetos = [];
             this.state.usuarios = [];
             if (this.isAuthenticatedView(this.state.view)) {
               this.setView("login", true);
             }
           } else {
-            this.state.user = null;
             this.state.meusObjetos = [];
             this.state.usuarios = [];
             this.state.sessionRestoreFailed = true;
@@ -380,7 +388,7 @@ export class PucEncontraApp {
         body: JSON.stringify(payload),
       });
       this.setToken(response.token);
-      this.state.user = response.user;
+      this.setUser(response.user);
       this.setView("dashboard");
       this.setNotice("Login realizado.", "success");
       await this.refreshData();
@@ -398,7 +406,7 @@ export class PucEncontraApp {
         body: JSON.stringify(payload),
       });
       this.setToken(response.token);
-      this.state.user = response.user;
+      this.setUser(response.user);
       this.setView("dashboard");
       this.setNotice("Cadastro realizado.", "success");
       await this.refreshData();
@@ -414,7 +422,6 @@ export class PucEncontraApp {
       // O token local tambem precisa sair quando a sessao do servidor ja expirou.
     }
     this.setToken(null);
-    this.state.user = null;
     this.state.meusObjetos = [];
     this.setView("inicio");
     this.setNotice("Sessao encerrada.", "success");
@@ -540,10 +547,12 @@ export class PucEncontraApp {
     event.preventDefault();
     try {
       const payload = formData(event.currentTarget as HTMLFormElement);
-      this.state.user = await this.api.request<Usuario>("/auth/me/", {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-      });
+      this.setUser(
+        await this.api.request<Usuario>("/auth/me/", {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        }),
+      );
       this.setNotice("Perfil atualizado.", "success");
     } catch (error) {
       this.setNotice(error instanceof Error ? error.message : "Falha ao atualizar perfil.", "error");
@@ -624,7 +633,6 @@ export class PucEncontraApp {
     try {
       await this.api.request<void>("/auth/deactivate/", { method: "POST" });
       this.setToken(null);
-      this.state.user = null;
       this.state.meusObjetos = [];
       this.setView("inicio");
       this.setNotice("Conta desativada.", "success");

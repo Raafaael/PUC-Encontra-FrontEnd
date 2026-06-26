@@ -2,9 +2,11 @@ import { STORAGE_KEYS } from "../config.js";
 import type { AppState } from "../types.js";
 
 export function createInitialState(): AppState {
+  const token = localStorage.getItem(STORAGE_KEYS.token);
+
   return {
-    token: localStorage.getItem(STORAGE_KEYS.token),
-    user: null,
+    token,
+    user: token ? readStoredUser() : null,
     view: "inicio",
     objetos: [],
     meusObjetos: [],
@@ -38,4 +40,16 @@ export function createInitialState(): AppState {
     loading: false,
     sessionRestoreFailed: false,
   };
+}
+
+function readStoredUser(): AppState["user"] {
+  const storedUser = localStorage.getItem(STORAGE_KEYS.user);
+  if (!storedUser) return null;
+
+  try {
+    return JSON.parse(storedUser) as AppState["user"];
+  } catch {
+    localStorage.removeItem(STORAGE_KEYS.user);
+    return null;
+  }
 }
